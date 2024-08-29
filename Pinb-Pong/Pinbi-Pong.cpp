@@ -1,8 +1,12 @@
 #include "raylib.h"
 
-//Scoring
+//Global Variables
 int cpu_score = 0;
 int player_score = 0;
+Color Green = Color{ 38,185,154,255 };
+Color Dark_Green = Color{ 20,160,133,255 };
+Color Light_Green = Color{ 129,204,184,255 };
+Color Yellow = Color{ 243,213,91,255 };
 
 // Objects Creation
 class Ball {
@@ -13,7 +17,7 @@ public:
 
 	void Draw() 
 	{
-		DrawCircle(x, y, radius, WHITE);
+		DrawCircle(x, y, radius, Yellow);
 	}
 	void Update() 
 	{
@@ -68,8 +72,9 @@ public:
 	float width, height;
 	int speed;
 
-	void Draw() {
-		DrawRectangle(x, y, width, height, WHITE);
+	void Draw() 
+	{
+		DrawRectangleRounded(Rectangle{ x, y,width, height }, 0.8, 0, WHITE);
 	}
 	void Update() {
 		if (IsKeyDown(KEY_UP))
@@ -161,7 +166,9 @@ int main() {
 		}
 
 		//Draw Elements
-		ClearBackground(BLACK);
+		ClearBackground(Dark_Green);
+		DrawRectangle(screen_width / 2, 0, screen_width / 2, screen_height, Green);
+		DrawCircle(screen_width / 2, screen_height / 2, 150, Light_Green);
 		DrawLine(screen_width / 2, 0, screen_width / 2, screen_height, WHITE);
 		ball.Draw();
 		player.Draw();
