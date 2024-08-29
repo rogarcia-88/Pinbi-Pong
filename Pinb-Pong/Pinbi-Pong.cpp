@@ -1,16 +1,22 @@
 #include "raylib.h"
 
+//Scoring
+int cpu_score = 0;
+int player_score = 0;
+
 // Objects Creation
 class Ball {
 public:
-	int x, y;
+	float x, y;
 	int speed_x, speed_y;
-	float radius;
+	int radius;
 
-	void Draw() {
+	void Draw() 
+	{
 		DrawCircle(x, y, radius, WHITE);
 	}
-	void Update() {
+	void Update() 
+	{
 		x += speed_x;
 		y += speed_y;
 		
@@ -19,10 +25,27 @@ public:
 			speed_y *= -1;
 		}
 
-		if (x + radius >= GetScreenWidth() || x - radius <= 0)
+		if (x + radius >= GetScreenWidth()) // CPU Wins
 		{
-			speed_x *= -1;
+			cpu_score++;
+			ResetBall();
 		}
+			
+		if (x - radius <= 0) // Player Wins
+		{
+			player_score++;
+			ResetBall();
+		}	
+	}
+	
+	void ResetBall()
+	{
+		x = GetScreenWidth() / 2;
+		y = GetScreenHeight() / 2;
+
+		int speed_choices[2] = { -1,1 };
+		speed_x *= speed_choices[GetRandomValue(0, 1)];
+		speed_y *= speed_choices[GetRandomValue(0, 1)];
 
 	}
 };
@@ -41,8 +64,8 @@ protected:
 		}
 	}
 public:
-	int x, y;
-	int width, height;
+	float x, y;
+	float width, height;
 	int speed;
 
 	void Draw() {
@@ -88,6 +111,8 @@ Ball ball;
 Paddle player;
 CpuPaddle cpu;
 
+
+
 int main() {
 	
 	// Screen Definitions
@@ -116,16 +141,24 @@ int main() {
 	cpu.y = screen_height / 2 - cpu.height / 2;
 	cpu.speed = 6;
 
-
-
-
+	//Game Loop
 	while (!WindowShouldClose()) {
 		BeginDrawing();
 
-		//Update
+		//Updating
 		ball.Update();
 		player.Update();
 		cpu.Update(ball.y);
+
+		//Check Collisions
+		if (CheckCollisionCircleRec(Vector2{ball.x, ball.y}, ball.radius, Rectangle{ player.x, player.y, player.width, player.height }))
+		{
+			ball.speed_x *= -1;
+		}
+		if (CheckCollisionCircleRec(Vector2{ ball.x, ball.y }, ball.radius, Rectangle{ cpu.x, cpu.y, cpu.width, cpu.height }))
+		{
+			ball.speed_x *= -1;
+		}
 
 		//Draw Elements
 		ClearBackground(BLACK);
@@ -133,15 +166,13 @@ int main() {
 		ball.Draw();
 		player.Draw();
 		cpu.Draw();
-		
-		
-		
+		DrawText(TextFormat("%i", cpu_score), screen_width / 4 - 20, 20, 80, WHITE);
+		DrawText(TextFormat("%i", player_score), 3*screen_width / 4 - 20, 20, 80, WHITE);
+
+			
 		EndDrawing(); 
 
 	}
-
-
-
 
 	CloseWindow();
 
