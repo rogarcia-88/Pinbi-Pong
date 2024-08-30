@@ -3,6 +3,7 @@
 //Global Variables
 int cpu_score = 0;
 int player_score = 0;
+
 Color Green = Color{ 38,185,154,255 };
 Color Dark_Green = Color{ 20,160,133,255 };
 Color Light_Green = Color{ 129,204,184,255 };
@@ -147,34 +148,51 @@ int main() {
 	cpu.speed = 6;
 
 	//Game Loop
-	while (!WindowShouldClose()) {
+	while (!WindowShouldClose()) 
+	{
 		BeginDrawing();
 
-		//Updating
-		ball.Update();
-		player.Update();
-		cpu.Update(ball.y);
-
-		//Check Collisions
-		if (CheckCollisionCircleRec(Vector2{ball.x, ball.y}, ball.radius, Rectangle{ player.x, player.y, player.width, player.height }))
+		if (cpu_score == 10)
 		{
-			ball.speed_x *= -1;
-		}
-		if (CheckCollisionCircleRec(Vector2{ ball.x, ball.y }, ball.radius, Rectangle{ cpu.x, cpu.y, cpu.width, cpu.height }))
-		{
-			ball.speed_x *= -1;
+			ClearBackground(WHITE);
+			DrawText("Game Over!", screen_width / 2, screen_height / 2, 60, RED);
 		}
 
-		//Draw Elements
-		ClearBackground(Dark_Green);
-		DrawRectangle(screen_width / 2, 0, screen_width / 2, screen_height, Green);
-		DrawCircle(screen_width / 2, screen_height / 2, 150, Light_Green);
-		DrawLine(screen_width / 2, 0, screen_width / 2, screen_height, WHITE);
-		ball.Draw();
-		player.Draw();
-		cpu.Draw();
-		DrawText(TextFormat("%i", cpu_score), screen_width / 4 - 20, 20, 80, WHITE);
-		DrawText(TextFormat("%i", player_score), 3*screen_width / 4 - 20, 20, 80, WHITE);
+		else if (player_score == 10)
+		{
+			ClearBackground(WHITE);
+			DrawText("Player Win!", screen_width / 2, screen_height / 2, 60, GREEN);
+		}
+
+		else
+
+		{
+			//Updating
+			ball.Update();
+			player.Update();
+			cpu.Update(ball.y);
+
+			//Check Collisions
+			if (CheckCollisionCircleRec(Vector2{ ball.x, ball.y }, ball.radius, Rectangle{ player.x, player.y, player.width, player.height }))
+			{
+				ball.speed_x *= -1;
+			}
+			if (CheckCollisionCircleRec(Vector2{ ball.x, ball.y }, ball.radius, Rectangle{ cpu.x, cpu.y, cpu.width, cpu.height }))
+			{
+				ball.speed_x *= -1;
+			}
+
+			//Draw Elements
+			ClearBackground(Dark_Green);
+			DrawRectangle(screen_width / 2, 0, screen_width / 2, screen_height, Green);
+			DrawCircle(screen_width / 2, screen_height / 2, 150, Light_Green);
+			DrawLine(screen_width / 2, 0, screen_width / 2, screen_height, WHITE);
+			ball.Draw();
+			player.Draw();
+			cpu.Draw();
+			DrawText(TextFormat("%i", cpu_score), screen_width / 4 - 20, 20, 80, WHITE);
+			DrawText(TextFormat("%i", player_score), 3 * screen_width / 4 - 20, 20, 80, WHITE);
+		}
 
 			
 		EndDrawing(); 
