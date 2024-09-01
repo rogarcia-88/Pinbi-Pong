@@ -55,6 +55,51 @@ public:
 	}
 };
 
+class Collider{
+private:
+	int PosX, PosY;
+
+
+public:
+	
+	float width, height;
+	int frames_counter = 0;
+
+	void setPos(int spawnX, int spawnY) {
+		PosX = spawnX;
+		PosY = spawnY;
+		
+		frames_counter++;
+
+		if (((frames_counter / 120) % 2) == 1)
+		{
+			spawnX = GetRandomValue(1, 32);
+			spawnY = GetRandomValue(1, 20);
+			frames_counter = 0;
+		}
+	}
+
+	int getPosX() {
+		return PosX;
+	}
+	int getPosY() {
+		return PosY;
+	}
+	void Draw()
+	{
+		
+		
+		/*PosX = GetScreenWidth() /  spawn_x - width / 2;
+		PosY = GetScreenHeight() / spawn_y - height / 2;
+
+		DrawRectangle(PosX,PosY, width, height, WHITE);
+		DrawText(TextFormat("%i", frames_counter), 360, 180, 80, LIGHTGRAY);*/
+	}
+
+	
+
+};
+
 class Paddle {
 protected:
 	void LimitMovement() {
@@ -72,11 +117,11 @@ public:
 	float x, y;
 	float width, height;
 	int speed;
-
-	void Draw() 
+	void Draw()
 	{
 		DrawRectangleRounded(Rectangle{ x, y,width, height }, 0.8, 0, WHITE);
 	}
+	
 	void Update() {
 		if (IsKeyDown(KEY_UP))
 		{
@@ -116,17 +161,22 @@ public:
 Ball ball; 
 Paddle player;
 CpuPaddle cpu;
+Collider collider;
 
 
 
 int main() {
 	
-	// Screen Definitions
+	// Initialization
 	 const int screen_width = 1280;
 	 const int screen_height = 800;
 	InitWindow(screen_width, screen_height, "Pinbi-Pong");
 	SetTargetFPS(60);
+	float randomX = screen_width / GetRandomValue(1, 32);
+	float randomY = screen_height / GetRandomValue(1, 20);
+	int frames_counter = 0;
 
+	
 	//Ball Properties
 	ball.radius = 20;
 	ball.x = screen_width / 2;
@@ -147,9 +197,17 @@ int main() {
 	cpu.y = screen_height / 2 - cpu.height / 2;
 	cpu.speed = 6;
 
+	//Collider Properties
+	collider.height = 40;
+	collider.width = 40;
+	int spawnX = GetRandomValue(1, 32);
+	int spawnY = GetRandomValue(1, 20);
+
+
 	//Game Loop
 	while (!WindowShouldClose()) 
 	{
+		
 		BeginDrawing();
 
 		if (cpu_score == 10)
@@ -171,6 +229,16 @@ int main() {
 			ball.Update();
 			player.Update();
 			cpu.Update(ball.y);
+			collider.setPos(200, 200);
+
+			
+			frames_counter++;
+			if (((frames_counter / 120) % 2) == 1)
+			{
+				randomX = GetRandomValue(1, 1200) ;
+				randomY = GetRandomValue(1, 720);
+				frames_counter = 0;
+			}
 
 			//Check Collisions
 			if (CheckCollisionCircleRec(Vector2{ ball.x, ball.y }, ball.radius, Rectangle{ player.x, player.y, player.width, player.height }))
@@ -178,6 +246,10 @@ int main() {
 				ball.speed_x *= -1;
 			}
 			if (CheckCollisionCircleRec(Vector2{ ball.x, ball.y }, ball.radius, Rectangle{ cpu.x, cpu.y, cpu.width, cpu.height }))
+			{
+				ball.speed_x *= -1;
+			}
+			if (CheckCollisionCircleRec(Vector2{ ball.x, ball.y }, ball.radius, Rectangle{randomX, randomY, 80, 80}))
 			{
 				ball.speed_x *= -1;
 			}
@@ -190,6 +262,9 @@ int main() {
 			ball.Draw();
 			player.Draw();
 			cpu.Draw();
+			DrawRectangle(randomX, randomY, 80, 80, LIGHTGRAY);
+
+			//collider.Draw();
 			DrawText(TextFormat("%i", cpu_score), screen_width / 4 - 20, 20, 80, WHITE);
 			DrawText(TextFormat("%i", player_score), 3 * screen_width / 4 - 20, 20, 80, WHITE);
 		}
